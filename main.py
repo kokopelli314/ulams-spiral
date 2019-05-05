@@ -1,7 +1,9 @@
 import itertools
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
+import math
 import numpy as np
+import random
 
 # Infinite Sieve of Eratosthenes
 # Code by David Eppstein, UC Irvine, 28 Feb 2002
@@ -43,47 +45,48 @@ def gen_primes():
 
 # Draw Ulam's spiral
 
-fig = plt.figure(figsize=(10, 10))
-ax = fig.add_subplot(111)
-
-cell_x = 0.5
-cell_y = 0.5
-num_ints = 20
-primes = list(itertools.islice(gen_primes(), num_ints))
+num_ints = 350000
+primes = {p: None for p in itertools.islice(gen_primes(), math.floor(num_ints/4))}
 
 print(list(primes))
-
-dx_sign = 1
-dy_sign = 0
-ints_til_turn = 1
+print(max(primes))
 
 moves = itertools.cycle([(1,0), (0, -1), (-1, 0), (0,1 )])
 check = next(moves)
 move, check = check, next(moves)
 
 fin = {}
+size = 1
 
-for n in range(0, num_ints):
-	plt.text(cell_x, cell_y, '%s' % n, size=20)
+im_width, im_height = 1000, 1000
+spiral = np.zeros((im_width, im_height))
+cell_x = math.floor(im_width/2)
+cell_y = math.floor(im_height/2)
+
+for n in range(0, im_width*im_height):
+	plt.text(cell_x, cell_y, '%s' % n, size=5, color='grey')
 	if n in primes:
-		r = patches.Rectangle(
-			(cell_x, cell_y), 0.1, 0.1,
-		    linewidth=1, edgecolor='g', facecolor='b',
-		)
-		ax.add_patch(r)
+		if cell_x < im_width and cell_y < im_height:
+			spiral[cell_x][cell_y] = 1
 	fin[cell_x, cell_y] = 1
 
-	cell_x += 0.1 * move[0]
-	cell_y += 0.1 * move[1]
+	cell_x += size * move[0]
+	cell_y += size * move[1]
 
 	check_position = (
-		cell_x + 0.1*check[0],
-		cell_y + 0.1*check[1],
+		cell_x + size*check[0],
+		cell_y + size*check[1],
 	)
 	if check_position not in fin:
 		move, check = check, next(moves)
 
-plt.show()
 
+fig = plt.figure(figsize=(10, 10))
+ax = fig.add_subplot(111)
 
-
+print('making image')
+ax.imshow(spiral, interpolation='none')
+print('saving image...')
+plt.savefig('D:\\media\\primes\\ulams_spiral\\batch_1_%sx%s_%s.png' % (
+	im_width, im_height, random.randint(0, 10000),
+))
