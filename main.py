@@ -51,6 +51,7 @@ primes = {p: None for p in itertools.islice(gen_primes(), math.floor(num_ints/4)
 print(list(primes))
 print(max(primes))
 
+# Method from https://www.thanassis.space/primes.html
 moves = itertools.cycle([(1,0), (0, -1), (-1, 0), (0,1 )])
 check = next(moves)
 move, check = check, next(moves)
